@@ -8,6 +8,10 @@ from ..inference import inference
 from .download import download
 from .train import Enhancer, HParams
 
+import pathlib
+temp = pathlib.PosixPath
+pathlib.PosixPath = pathlib.WindowsPath
+
 logger = logging.getLogger(__name__)
 
 
