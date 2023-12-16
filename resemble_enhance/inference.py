@@ -1,5 +1,6 @@
 import logging
 import time
+import gc
 
 import torch
 import torch.nn.functional as F
@@ -135,8 +136,7 @@ def inference(model, dwav, sr, device, chunk_seconds: float = 30.0, overlap_seco
         beta=14.769656459379492,
     )
 
-    del sr  # Everything is in hp.wav_rate now
-
+    del sr  # We are now using hp.wav_rate as the sampling rate
     sr = hp.wav_rate
 
     if torch.cuda.is_available():
@@ -149,13 +149,27 @@ def inference(model, dwav, sr, device, chunk_seconds: float = 30.0, overlap_seco
     hop_length = chunk_length - overlap_length
 
     chunks = []
+
     for start in trange(0, dwav.shape[-1], hop_length):
-        chunks.append(inference_chunk(model, dwav[start : start + chunk_length], sr, device))
+        new_chunk = inference_chunk(model, dwav[start : start + chunk_length], sr, device)
+        chunks.append(new_chunk)
 
-    hwav = merge_chunks(chunks, chunk_length, hop_length, sr=sr, length=dwav.shape[-1])
+        # Delete the processed segment to free up memory
+        # del new_chunk
+        # if torch.cuda.is_available():
+        #     torch.cuda.empty_cache()
 
+        # Force garbage collection at this point (optional and may slow down processing)
+        # gc.collect()
+
+    hwav = merge_chunks(chunks, chunk_length, hop_length, sr=sr,length=dwav.shape[-1])
+    # Clean up chunks to free memory after merging
+    
+    del chunks[:]
     if torch.cuda.is_available():
-        torch.cuda.synchronize()
+         torch.cuda.empty_cache()
+
+    gc.collect()  # Explicitly call garbage collector again
 
     elapsed_time = time.perf_counter() - start_time
     logger.info(f"Elapsed time: {elapsed_time:.3f} s, {hwav.shape[-1] / elapsed_time / 1000:.3f} kHz")
