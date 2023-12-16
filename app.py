@@ -1,6 +1,7 @@
 import gradio as gr
 import torch
 import torchaudio
+import gc
 
 from resemble_enhance.enhancer.inference import denoise, enhance
 
@@ -9,6 +10,12 @@ if torch.cuda.is_available():
 else:
     device = "cpu"
 
+
+def clear_gpu_cash():
+    # del model
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
 def _fn(path, solver, nfe, tau, denoising):
     if path is None:
@@ -27,6 +34,7 @@ def _fn(path, solver, nfe, tau, denoising):
     wav1 = wav1.cpu().numpy()
     wav2 = wav2.cpu().numpy()
 
+    clear_gpu_cash()
     return (new_sr, wav1), (new_sr, wav2)
 
 
