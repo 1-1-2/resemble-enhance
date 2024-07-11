@@ -1,3 +1,14 @@
+# Using Resemble Enhance on Windows
+
+This fork allows you to use Resemble Enhance on Windows. To get started:
+
+1. Ensure you have Python 3.10.x or Python 3.11 installed.
+2. Install CUDA 11.8 for optimal performance.
+3. Run `install.bat` to set up the environment.
+4. Launch the application with `launch.bat`.
+
+I've optimized the project to run smoothly on systems with 8GB VRAM. If you encounter issues with longer audio files, try reducing the chunk size.
+
 # Resemble Enhance
 
 [![PyPI](https://img.shields.io/pypi/v/resemble-enhance.svg)](https://pypi.org/project/resemble-enhance/)
