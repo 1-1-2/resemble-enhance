@@ -3,7 +3,7 @@
 python -m venv venv
 call venv/scripts/activate
 
-pip install torch==2.1.1+cu118 torchaudio==2.1.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.3.1+cu118 torchaudio==2.3.1+cu118 --index-url https://download.pytorch.org/whl/torch_stable.html
 pip install -r requirements.txt
 
 @echo Instaling deepspeed for python 3.10.x or 3.11 and CUDA 11.8
